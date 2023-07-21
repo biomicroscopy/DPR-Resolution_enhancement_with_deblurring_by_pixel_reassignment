@@ -18,6 +18,7 @@ filetype = 'tif'; % type of files to be processed
 file_name = 'test_image';
 n = 60; % frame number
 img = [];
+% Input image requires the DOUBLE data type
 parfor i = 1:n
 %     % run on Windows
 %     img(:,:,i) = double(imread([data_folder,'\',file_name,'.',filetype],i)); 
@@ -27,7 +28,7 @@ end
 
 %% Set DPR parameters
 
-% PSF FWHM in pixels, background is the radius of the local-minimum filter in pixels, temporal process
+% PSF FWHM in pixels, background is the radius of the local-minimum filter in pixels, temporal analysis
 PSF = 4;
 options = DPRSetParameters(PSF,'gain',2,'background',10,'temporal','mean'); 
 
