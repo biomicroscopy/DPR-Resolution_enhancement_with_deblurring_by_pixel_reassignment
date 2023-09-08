@@ -29,6 +29,8 @@ end
 %% Set DPR parameters
 
 % PSF FWHM in pixels, background is the radius of the local-minimum filter in pixels, temporal analysis
+% If PSF is unknown, its FWHM in pixels can be simply estimated by (0.61*lambda/NA)/pixel_size. 
+% lambda is the emission wavelength, NA is the numerical aperture of the objective
 PSF = 4;
 options = DPRSetParameters(PSF,'gain',2,'background',10,'temporal','mean'); 
 
