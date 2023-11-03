@@ -41,7 +41,7 @@ options = DPRSetParameters(PSF,'gain',2,'background',10,'temporal','mean');
 [I_DPR,raw_magnified] = DPRStack(img,PSF,options);
 
 % % For single-frame image
-% [I_DPR,raw_magnified] = DPR_UpdateSignle_mex(img,PSF,options);
+% [I_DPR,raw_magnified] = DPR_UpdateSingle_mex(img,PSF,options);
 
 %% Svae image as needed
 mkdir DPR_image
