@@ -4,7 +4,7 @@ n = size(I_in,3);
 I_DPR = []; raw_magnified = [];
 %%
 parfor i = 1 : n
-    [single_I_DPR,single_raw_mag] = DPR_UpdateSignle_mex(I_in(:,:,i),PSF,options);
+    [single_I_DPR,single_raw_mag] = DPR_UpdateSingle_mex(I_in(:,:,i),PSF,options);
     I_DPR(:,:,i) = single_I_DPR;
     raw_magnified(:,:,i) = single_raw_mag;
 end
