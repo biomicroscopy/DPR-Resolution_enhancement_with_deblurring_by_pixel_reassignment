@@ -4,7 +4,7 @@ A detailed description of the method can be found in:
 
 Zhao, B., and Mertz, J. Resolution enhancement with deblurring by pixel reassignment (DPR)
 
-doi: https://doi.org/10.1101/2023.07.24.550382
+DOI:10.1117/1.AP.5.6.066004
 
 If you find this code useful to your research, please consider citing it. 
 
@@ -22,6 +22,8 @@ The repository comprises the Matlab functions for DPR
     This function is used to process a single image and is developed for Windows computer using 64bits Matlab.
   - DPR_UpdateSingle_mex.maci64
     This function is used to process a single image and is developed for Macbook using Matlab.
+  - DPR_UpdateSingle.m
+    This is the source code for DPR.
   - save_tiff_img.m
     This function is used to save the DPR-enhanced image as Tiff.
  - Test_image
@@ -33,4 +35,4 @@ The repository comprises the Matlab functions for DPR
 Please check the demo scripts to get started.
 
 ## Feedback
-If you have any comments, suggestions, or questions, please do contact us at byzhao@bu.edu
+If you have any comments, suggestions, or questions, please do contact us at byzhao@bu.edu.
