@@ -23,6 +23,8 @@ function [single_frame_I_out,single_frame_I_magnified,gain,window_radius] = DPR_
 % OUTPUT:
 % I_out: Reconstructed image from DPR
 % I_magnified: Magnified raw image/image stack (dependent on the input)
+%
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Read inputs from options
@@ -38,7 +40,7 @@ PSF = PSF/1.6651;
 x0 = linspace(-0.5,0.5,number_column_initial)';
 y0 = linspace(-0.5,0.5,number_row_initial)';
 [X0,Y0] = meshgrid(x0,y0);
-x = linspace(-0.5,0.5,round(5*number_column_initial/PSF))';  %upscaled image has 5 pixels per PSF 
+x = linspace(-0.5,0.5,round(5*number_column_initial/PSF))';  %upscaled image has 5 pixels per PSF (1/e radius) 
 y = linspace(-0.5,0.5,round(5*number_row_initial/PSF))';
 [X,Y] = meshgrid(x,y);
 
