@@ -15,7 +15,9 @@ n = 60; % frame number
 
 %% Prepare image for saving
 save_folder = 'DPR_image'; % folder where all the DPR-enhanced images are saved.
-mkdir(save_folder)
+if ~exist(save_folder, 'dir')
+    mkdir(save_folder);
+end
 
 %% Set DPR parameters
 
