@@ -5,7 +5,7 @@ gcp
 %% Add path and direction of the images
 
 addpath(genpath('DPR_function'))
-data_folder = 'LS'; % folder  where all the files are located.
+data_folder = 'Test_image'; % folder  where all the files are located.
 filetype = 'tif'; % type of files to be processed
 
 %% Set image parameter
@@ -15,7 +15,7 @@ n = 60; % frame number
 
 %% Prepare image for saving
 save_folder = 'DPR_image'; % folder where all the DPR-enhanced images are saved.
-mkdir save_folder
+mkdir(save_folder)
 
 %% Set DPR parameters
 
