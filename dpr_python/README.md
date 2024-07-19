@@ -1,5 +1,5 @@
 
-# DPR Project
+# Python Tools for the DPR Algorithm
 
 ## Overview
 
@@ -10,10 +10,8 @@ The project supports various image formats, including TIFF, JPEG, and PNG. Key f
 ## Table of Contents
 
 - [Project Structure](#project-structure)
-- [Requirements](#requirements)
-- [Installation](#installation)
+- [Setup](#setup)
 - [Usage](#usage)
-- [Contributing](#contributing)
 - [License](#license)
 
 ## Project Structure
@@ -30,7 +28,7 @@ The project supports various image formats, including TIFF, JPEG, and PNG. Key f
 ├── README.md
 ```
 
-## Installation
+## Setup
 
 Before getting started, ensure you have the following requirements:
 1. **Python 3.7 or higher**
@@ -55,6 +53,16 @@ Before getting started, ensure you have the following requirements:
     git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
     cd /path/to/the/Resolution_Enhancement_With_Deblurring-main
     ```
+1. **FIJI**
+
+   If you are processing TIFF (e.g. test_image.tif) files, it is recommended to use FIJI for viewing the results. FIJI is an enhanced version of ImageJ, bundled with many plugins to facilitate scientific image analysis.
+    1. Download FIJI:
+       - Visit the FIJI [download page](https://imagej.net/software/fiji/downloads).
+       - Choose the appropriate version for your operating system (Windows, MacOS, or Linux).
+    1. Install FIJI:
+       - Follow the instructions provided on the download page to install FIJI on your system.
+    1. Open Your TIFF Files:
+       - After installing FIJI, you can open the TIFF files by simply dragging and dropping them onto the FIJI frontend.
 
 ## Usage
 1. Run the Demo script
@@ -64,7 +72,17 @@ Before getting started, ensure you have the following requirements:
     ```bash
     python3 dpr_demo.py
     ```
+1. Provide the requested information:
+
+    - File Name with Type: You will be prompted to enter the image file name with its type (e.g., test_image.tif). Press Enter to use the default value.
+    - Use Default Parameters: You will be asked if you want to use the default DPR parameters. Press Enter to use the default values for psf, gain, background, and temporal.
+    - Custom Parameters: If you choose not to use the default parameters, you will need to provide custom values for each parameter as prompted.
+
+    For a demo, please use the default variables.
 1. Check the Image process result
     -   The processed images will be saved in a directory named `DPR_results` inside the `test_images`.
     -   The saved image files will have `_result` appended to their original names.
-    -   Open these files using any standard image viewer to inspect the enhanced images.
+    -   Open jpg/png files using any standard image viewer to inspect the enhanced images. For TIFF files, using FIJI for best compatibility and analysis. For more information on how to download and use FIJI, please check the FIJI section in the [Setup](#setup).
+
+## License
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/LICENSE) file for details.
