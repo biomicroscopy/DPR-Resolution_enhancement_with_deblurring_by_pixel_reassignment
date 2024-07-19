@@ -1,0 +1,5 @@
+numpy==1.23.5
+scipy==1.9.3
+pillow==9.3.0
+tifffile==2022.10.10
+imageio==2.22.2
