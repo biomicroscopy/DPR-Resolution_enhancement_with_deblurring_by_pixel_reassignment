@@ -37,7 +37,16 @@ Before getting started, ensure you have the following requirements:
     python3 --version
     ```
     If you don't have Python 3 installed, you can download it from [python.org](https://www.python.org/downloads/).
+1. **Clone the repository:**
 
+    ```bash
+    git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
+    cd Resolution_Enhancement_With_Deblurring-main/dpr_python
+    ```
+1. Upgrade the pip version
+    ```sh
+    pip install --upgrade pip
+    ```
 1. **Required Python packages**
     Install the necessary packages by running:
     ```sh
@@ -46,12 +55,6 @@ Before getting started, ensure you have the following requirements:
     or run the below CLI
     ```sh
     pip install numpy scipy Pillow tifffile imageio
-    ```
-1. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
-    cd /path/to/the/Resolution_Enhancement_With_Deblurring-main
     ```
 1. **FIJI**
 
@@ -62,7 +65,7 @@ Before getting started, ensure you have the following requirements:
     1. Install FIJI:
        - Follow the instructions provided on the download page to install FIJI on your system.
     1. Open Your TIFF Files:
-       - After installing FIJI, you can open the TIFF files by simply dragging and dropping them onto the FIJI frontend.
+       - After installing FIJI, you can open the TIFF files by simply dragging and dropping them onto the FIJI front end.
 
 ## Usage
 1. Run the Demo script
@@ -82,7 +85,7 @@ Before getting started, ensure you have the following requirements:
 1. Check the Image process result
     -   The processed images will be saved in a directory named `DPR_results` inside the `test_images`.
     -   The saved image files will have `_result` appended to their original names.
-    -   Open jpg/png files using any standard image viewer to inspect the enhanced images. For TIFF files, using FIJI for best compatibility and analysis. For more information on how to download and use FIJI, please check the FIJI section in the [Setup](#setup).
+    -   Open jpg/png files using any standard image viewer to inspect the enhanced images. For TIFF files, use FIJI for best compatibility and analysis. For more information on how to download and use FIJI, please check the FIJI section in the [Setup](#setup).
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/LICENSE) file for details.
