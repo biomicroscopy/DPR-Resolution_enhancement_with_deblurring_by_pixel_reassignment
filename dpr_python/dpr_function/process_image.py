@@ -5,9 +5,6 @@ import numpy as np
 import tifffile as tiff
 from PIL import Image
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 
 def process_image(data_folder, file_name, file_type, psf, options):
     """
@@ -28,13 +25,13 @@ def process_image(data_folder, file_name, file_type, psf, options):
     2. Applies the DPR algorithm to enhance the images.
     3. Saves the resulting DPR-enhanced images to a designated output directory.
     """
-    logging.info("Starting DPR demo.")
+    print(f"Starting DPR demo.")
 
     # Load the image stack to determine the number of frames
     try:
         image_stack = load_image_stack(data_folder, file_name, file_type)
-        logging.info(f"Loaded input image stack from \"{data_folder}/{file_name}.{file_type}\":"
-                     f" {image_stack.shape} - dimensions(height, width, frames)")
+        print(f"Loaded input image stack from \"{data_folder}/{file_name}.{file_type}\":"
+              f" {image_stack.shape} - dimensions(height, width, frames)")
     except Exception as e:
         logging.error(f"Error loading images: {e}")
         return
@@ -53,9 +50,11 @@ def process_image(data_folder, file_name, file_type, psf, options):
     # Save the DPR-enhanced image
     try:
         save_image(dpr_image, save_folder, f'{file_name}_result', file_type)
-        logging.info(f"Results saved to disk: \"{save_folder}/{file_name}_result.{file_type}\"")
+        print(f"Results saved to disk: \"{save_folder}/{file_name}_result.{file_type}\"")
     except Exception as e:
         logging.error(f"Error saving results: {e}")
+
+    return image_stack, dpr_image, magnified_image
 
 
 def save_image(image, save_folder, file_name, file_type):
