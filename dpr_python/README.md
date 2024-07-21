@@ -54,7 +54,7 @@ Before getting started, ensure you have the following requirements:
     ```
     or run the below CLI
     ```sh
-    pip install numpy scipy Pillow tifffile imageio
+    pip install numpy scipy Pillow tifffile imageio matplotlib
     ```
 1. **FIJI**
 
