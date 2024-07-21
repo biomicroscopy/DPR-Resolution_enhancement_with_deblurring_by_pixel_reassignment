@@ -1,9 +1,6 @@
 import numpy as np
-import logging
+import sys
 from dpr_function import dpr_update_single
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def dpr_stack(input_stack, psf, options):
@@ -26,10 +23,11 @@ def dpr_stack(input_stack, psf, options):
     dpr_stack_zeros = np.zeros((magnified_shape[0], magnified_shape[1], num_frames))
     magnified_stack = np.zeros((magnified_shape[0], magnified_shape[1], num_frames))
 
-    logging.info(f"Starting DPR stack processing for {num_frames} frames")
+    print(f"Starting DPR stack processing for {num_frames} frames")
 
     for i in range(num_frames):
-        logging.info(f"Processing frame {i + 1}/{num_frames}")
+        sys.stdout.write(f"\rProcessing frame {i + 1}/{num_frames}")
+        sys.stdout.flush()
         dpr_frame, magnified_frame, gain, window_radius = \
             dpr_update_single.dpr_update_single(input_stack[:, :, i], psf, options)
         dpr_stack_zeros[:, :, i] = dpr_frame
@@ -42,5 +40,5 @@ def dpr_stack(input_stack, psf, options):
     elif temporal == 'var':
         dpr_stack_zeros = np.var(dpr_stack_zeros, axis=2)
 
-    logging.info("Completed DPR stack processing")
+    print(f"\nCompleted DPR stack processing")
     return dpr_stack_zeros, magnified_stack
