@@ -28,6 +28,6 @@ def dpr_set_parameters(psf, **kwargs):
         else:
             raise ValueError(f"Unknown parameter '{key}'")
 
-    logging.info(f"DPR parameters: {options}")
+    print(f"DPR parameters: {options}")
 
     return options
