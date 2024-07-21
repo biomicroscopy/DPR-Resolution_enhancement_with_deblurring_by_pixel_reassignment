@@ -33,7 +33,8 @@ def main():
     # Get user inputs
     data_folder = 'test_images'
     file_name_with_type = get_user_input(
-        "Enter the file name with type or press Enter to use the default value:",
+        "The image should be in the 'test_images' folder. \nEnter the file name with type or press Enter to use the "
+        "default value:",
         "test_image.tif"
     )
     file_name, file_type = file_name_with_type.rsplit('.', 1)
