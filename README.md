@@ -1,18 +1,19 @@
-# Resolution enhancement with deblurring by pixel reassignment (DPR)
-Welcome to the repository for Resolution Enhancement With Deblurring, a project focused on improving the resolution of images through advanced deblurring algorithms. This project is designed to enhance the clarity and detail of images used in scientific and other imaging applications.
+# Resolution Enhancement Algorithm - Deblurring by Pixel Reassignment (DPR)
+Welcome to the repository for Resolution Enhancement Algorithm - DPR, a project focused on improving the resolution of images through advanced deblurring algorithms. This project is designed to enhance the clarity and detail of images used in scientific and other imaging applications.
+
+A detailed description of the method can be found in: DOI:10.1117/1.AP.5.6.066004
+
+Zhao, B., and Mertz, J. Resolution enhancement with deblurring by pixel reassignment (DPR). [Publication link](https://www.spiedigitallibrary.org/journals/advanced-photonics/volume-5/issue-06/066004/Resolution-enhancement-with-deblurring-by-pixel-reassignment/10.1117/1.AP.5.6.066004.full?webSyncID=100c5e17-3e55-b558-b001-3d8b3bd4461b&sessionGUID=d75b2c3e-257a-52be-e460-867d9b436758#_=_).
+
+If you find this code useful to your research, please consider **citing this paper**. Thank you!
 
 ## Overview
 This repository hosts a suite of tools and algorithms aimed at enhancing the resolution of images. We strive to provide clearer and more detailed visual data, which can significantly improve data analysis and research outcomes in various fields.
 
-Deblurring by pixel reassignment (DPR) is to perform PSF sharpening similar to deconvolution but in a manner less prone to noise-induced artifacts and without the requirement of a full model for the PSF. The basic principle of DPR is to reassignment the intensity value of pixels post-image acquisition. The pixel reassignment step size is dependent on the local log-image gradient. DPR relies solely on pixel reassignment. As such, no negativities are possible in the final image reconstruction. Moreover, intensity levels are rigorously conserved, with no requirement for additional procedures to ensure local linearity. 
+Deblurring by pixel reassignment (DPR) is to perform PSF sharpening similar to deconvolution but in a manner less prone to noise-induced artifacts and without the requirement of a full model for the PSF. The basic principle of DPR is to reassignment the intensity value of pixels post-image acquisition. The pixel reassignment step size is dependent on the local log-image gradient. DPR relies solely on pixel reassignment. As such, no negativities are possible in the final image reconstruction. Moreover, intensity levels are rigorously conserved, with no requirement for additional procedures to ensure local linearity.
 
-A detailed description of the method can be found in:
-
-Zhao, B., and Mertz, J. Resolution enhancement with deblurring by pixel reassignment (DPR). [Pub link](https://www.spiedigitallibrary.org/journals/advanced-photonics/volume-5/issue-06/066004/Resolution-enhancement-with-deblurring-by-pixel-reassignment/10.1117/1.AP.5.6.066004.full?webSyncID=100c5e17-3e55-b558-b001-3d8b3bd4461b&sessionGUID=d75b2c3e-257a-52be-e460-867d9b436758#_=_).
-
-DOI:10.1117/1.AP.5.6.066004
-
-If you find this code useful to your research, please consider citing it.
+## DPR Result Example
+<img src="https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/blob/main/imgs/dpr_result_02.png" width=75%>
   
 ## Features
   - **Advanced Deblurring Algorithms**: Techniques developed to effectively reduce blur and artifacts in microscopy images.
