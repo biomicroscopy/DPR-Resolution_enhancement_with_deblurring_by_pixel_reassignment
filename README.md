@@ -7,6 +7,10 @@ Zhao, B., and Mertz, J. Resolution enhancement with deblurring by pixel reassign
 
 If you find this code useful to your research, please consider **citing this paper**. Thank you!
 
+## User Feedback
+
+Your feedback helps guide our development and improvements. Please take a moment to fill out the [DPR Algorithm User Feedback](https://docs.google.com/forms/d/e/1FAIpQLSf3UcPsnofb7Hb-OURkfZoRNM6LJbGQPdsjCArrfbeH6jkigQ/viewform?usp=header) questionnaire to help us better understand your needs and further improve DPR.
+
 ## Overview
 This repository hosts a suite of tools and algorithms aimed at enhancing the resolution of images. We strive to provide clearer and more detailed visual data, which can significantly improve data analysis and research outcomes in various fields.
 
