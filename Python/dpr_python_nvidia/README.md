@@ -1,66 +1,15 @@
-<<<<<<< HEAD
-# Python Tools for the DPR Algorithm
-
-## Overview
-
-This directory contains the Python implementation of the Deblurring by Pixel Reassignment (DPR) algorithm.
-
-The project supports various image formats, including TIFF, JPEG, and PNG. It leverages GPU acceleration through NVIDIA CUDA to significantly speed up processing. Key functionalities include loading image stacks, applying the DPR algorithm using GPU acceleration, and saving the enhanced images.
-
-## Table of Contents
-
-=======
 # **DPR Algorithm (GPU-Optimized Python Version)**
 
 ## **Overview**
-This repository provides a **GPU-accelerated** implementation of the **Deblurring by Pixel Reassignment (DPR)** algorithm. It supports **TIFF, JPEG, and PNG** image formats and uses **NVIDIA CUDA** to significantly enhance processing speed.
+This repository provides a **GPU-accelerated** implementation of the [Deblurring by Pixel Reassignment](https://www.spiedigitallibrary.org/journals/advanced-photonics/volume-5/issue-06/066004/Resolution-enhancement-with-deblurring-by-pixel-reassignment/10.1117/1.AP.5.6.066004.full?webSyncID=100c5e17-3e55-b558-b001-3d8b3bd4461b&sessionGUID=d75b2c3e-257a-52be-e460-867d9b436758#_=_) (DPR) algorithm. It supports TIFF, JPEG, and PNG image formats and uses NVIDIA CUDA to enhance processing speed.
 
-### **Key Features:**
-- **GPU Acceleration**: Speeds up processing by **10-100x** compared to the CPU version.
-- **Multi-format Support**: Works with TIFF, JPEG, PNG images.
-- **Flexible Processing**: Supports both **default and custom** parameter configurations.
+Compared to the CPU version, the GPU-optimized implementation runs **10-100x faster**, depending on the image size and hardware.
 
----
+## Hardware Requirements
+This version requires a **computer with an NVIDIA GPU** (e.g., RTX 3080, Tesla V100).
+If your system **does not** have an NVIDIA GPU (e.g., MacBook, AMD GPU), use the `dpr_python_basic` version instead.
 
-## **Hardware Requirements**
-This version requires a **computer with an NVIDIA GPU** (e.g., RTX 3080, Tesla V100).  
-If your system **does not** have an NVIDIA GPU (e.g., MacBook, AMD GPU), use the **CPU-based Python version** instead.
-
----
-
-## **Performance**
-Compared to the CPU version, the **GPU-optimized** implementation runs **10-100x faster**, depending on the **image size** and **hardware**.  
-- **Larger images** benefit the most from GPU acceleration.
-- The speedup increases with **higher CUDA core counts**.
-
----
-
-## **Table of Contents**
->>>>>>> origin/dpr_nvidia
-- [Project Structure](#project-structure)
-- [Setup](#setup)
-- [CUDA and GPU Acceleration](#cuda-and-gpu-acceleration)
-- [Usage](#usage)
-- [License](#license)
-- [Contact](#contact)
-
-<<<<<<< HEAD
 ## Project Structure
-
-```plaintext
-├── dpr_gpu_functions/
-    ├── set_parameters_gpu.py
-    ├── process_image_gpu.py
-    ├── dpr_stack_gpu.py
-    ├── dpr_update_single_gpu.py
-├── test_images/
-    ├── test_image.tif
-    ├── test_image.jpg
-    ├── test_image.png
-=======
----
-
-## **Project Structure**
 ```plaintext
 ├── dpr_gpu_functions/
 │   ├── set_parameters_gpu.py
@@ -68,10 +17,7 @@ Compared to the CPU version, the **GPU-optimized** implementation runs **10-100x
 │   ├── dpr_stack_gpu.py
 │   ├── dpr_update_single_gpu.py
 ├── test_images/
-│   ├── test_image.tif
-│   ├── test_image.jpg
-│   ├── test_image.png
->>>>>>> origin/dpr_nvidia
+│   ├── DPR_results/
 ├── dpr_demo.py
 ├── README.md
 ```
@@ -107,17 +53,12 @@ or manually via:
 ```sh
 pip install numpy scipy Pillow tifffile imageio matplotlib cupy-cuda12x
 ```
-<<<<<<< HEAD
-*Replace `cupy-cuda12x` with the version corresponding to your installed CUDA toolkit (e.g., `cupy-cuda11x` for CUDA 11.x).* For more details, refer to [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).
 
-### 5. FIJI (Recommended for TIFF images):
-=======
 **Important:**
 *Replace `cupy-cuda12x` with the version that matches your installed CUDA toolkit (e.g., `cupy-cuda11x` for CUDA 11.x). To determine your CUDA version, refer to the [Confirm CUDA Installation](#confirm-cuda-installation) section. For more details, check the [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).*
 
 ### 5. FIJI (Optional):
->>>>>>> origin/dpr_nvidia
-FIJI is recommended for viewing TIFF images clearly.
+FIJI is recommended for viewing TIFF images.
 
 - Download FIJI from the [official page](https://imagej.net/software/fiji/downloads).
 - Install and open TIFF files by dragging and dropping them into the FIJI interface.
@@ -168,4 +109,4 @@ This project is licensed under the MIT License. See [LICENSE](https://github.com
 
 ## Contact
 
-For questions or assistance, please open an issue on the GitHub repository. We're happy to help!
+For questions or customized support, please open an issue on the GitHub repository or via email. We're happy to help!
