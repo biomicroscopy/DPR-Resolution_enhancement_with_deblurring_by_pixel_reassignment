@@ -26,7 +26,7 @@ Deblurring by pixel reassignment (DPR) is to perform PSF sharpening similar to d
 ## Getting Started
 To begin using the tools provided in this repository, please navigate to the specific directory of interest:
 
-  - For Python-based tools, see the Python [README](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/dpr_python/README.md).
+  - For Python-based tools, see the Python [README](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/Python/README.md).
   - For MATLAB-based tools, see the MATLAB [README](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/MatLab/README.md).
 
 These individual README files will provide you with detailed instructions on setting up and running the applications.
