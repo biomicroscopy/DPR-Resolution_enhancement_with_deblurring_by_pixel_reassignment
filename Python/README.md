@@ -5,8 +5,6 @@ This directory contains two versions of the **Deblurring by Pixel Reassignment (
 - 🖥️ **dpr_python_basic**: CPU-based implementation, compatible with most environments  
 - ⚡ **dpr_python_nvidia**: GPU-accelerated implementation using NVIDIA CUDA and CuPy  
 
-These tools are designed to enhance image resolution by applying DPR processing to image stacks (TIFF, JPEG, PNG).
-
 ## 📁 Repository Structure
 
 ```plaintext
@@ -20,11 +18,7 @@ Python/
 ├── dpr_python_nvidia/       # GPU-accelerated DPR version using CuPy
 │   ├── dpr_gpu_functions/   # GPU-optimized processing logic
 │   ├── test_images/         # Sample input images, and output images
-<<<<<<< HEAD
-│   ├── dpr_demo.py          # Entry point for GPU demo
-=======
-│   ├── dpr_gpu_demo.py          # Entry point for GPU demo
->>>>>>> efaa4e3 (Refactor the python libraries.)
+│   ├── dpr_gpu_demo.py      # Entry point for GPU demo
 │   └── README.md            # Documentation for the GPU version
 │
 └── README.md                # You're here!
