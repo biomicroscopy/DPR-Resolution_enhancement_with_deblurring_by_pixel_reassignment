@@ -20,7 +20,11 @@ Python/
 ├── dpr_python_nvidia/       # GPU-accelerated DPR version using CuPy
 │   ├── dpr_gpu_functions/   # GPU-optimized processing logic
 │   ├── test_images/         # Sample input images, and output images
+<<<<<<< HEAD
 │   ├── dpr_demo.py          # Entry point for GPU demo
+=======
+│   ├── dpr_gpu_demo.py          # Entry point for GPU demo
+>>>>>>> efaa4e3 (Refactor the python libraries.)
 │   └── README.md            # Documentation for the GPU version
 │
 └── README.md                # You're here!
@@ -28,21 +32,17 @@ Python/
 
 ## 🖥️ CPU-Based Version: `dpr_python_basic`
 
-- **Best for:** Systems without an NVIDIA GPU (e.g., MacBook, standard Windows PCs)
-- **Highlights:**
-  - Cross-platform compatibility
-  - Works out-of-the-box with Python and NumPy/SciPy
-  - No GPU or CUDA dependencies
+- Works on most computers, including Windows, Linux, and Mac.
+- No GPU or CUDA required.
+- Easy to set up and run with standard Python libraries.
 
 > 📄 See [`dpr_python_basic/README.md`](./dpr_python_basic/README.md) for setup and usage.
 
 ## ⚡ GPU-Based Version: `dpr_python_nvidia`
 
-- **Best for:** Systems with an NVIDIA GPU and CUDA installed
-- **Highlights:**
-  - Significantly faster processing (10x–100x compared to CPU)
-  - Leverages CuPy for GPU acceleration
-  - Requires proper CUDA toolkit and compatible CuPy version
+- Designed for computers with an NVIDIA GPU.
+- Uses CuPy for GPU acceleration.
+- Much faster than the CPU version, especially on large images.
 
 > 📄 See [`dpr_python_nvidia/README.md`](./dpr_python_nvidia/README.md) for installation, dependencies, and usage instructions.
 
@@ -62,11 +62,3 @@ Both versions support:
 ## 🤝 Contributing
 
 Feel free to open an issue or submit a pull request if you have improvements, bug fixes, or feature suggestions.
-
-## 📄 License
-
-This project is released under the [MIT License](../LICENSE).
-
-## 📬 Contact
-
-For questions or support, please reach out via GitHub Issues or Email.
