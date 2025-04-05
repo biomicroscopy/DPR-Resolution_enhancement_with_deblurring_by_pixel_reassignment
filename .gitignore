@@ -1,0 +1,8 @@
+# macOS system file
+.DS_Store
+
+# Python virtual environment
+venv/
+
+.Rhistory
+.idea/

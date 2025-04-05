@@ -3,9 +3,9 @@
 
 ## Overview
 
-This directory contains the Python implementation of the Deblurring by Pixel Reassignment (DPR) algorithm.
+This directory contains the Python implementation of the `Deblurring by Pixel Reassignment (DPR)` algorithm. It is designed to run on most environments, including Windows, macOS (MacBook), and others. If your device does not have an NVIDIA GPU, this CPU-based version is best suited for you.
 
-The project supports various image formats, including TIFF, JPEG, and PNG. Key functionalities include loading image stacks, applying the DPR algorithm, and saving the enhanced images.
+The library supports various image formats, such as TIFF, JPEG, and PNG. Key features include loading image stacks, applying the DPR algorithm, and saving the enhanced output.
 
 ## Table of Contents
 

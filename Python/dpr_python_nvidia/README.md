@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+# Python Tools for the DPR Algorithm
+
+## Overview
+
+This directory contains the Python implementation of the Deblurring by Pixel Reassignment (DPR) algorithm.
+
+The project supports various image formats, including TIFF, JPEG, and PNG. It leverages GPU acceleration through NVIDIA CUDA to significantly speed up processing. Key functionalities include loading image stacks, applying the DPR algorithm using GPU acceleration, and saving the enhanced images.
+
+## Table of Contents
+
+=======
 # **DPR Algorithm (GPU-Optimized Python Version)**
 
 ## **Overview**
@@ -24,6 +36,7 @@ Compared to the CPU version, the **GPU-optimized** implementation runs **10-100x
 ---
 
 ## **Table of Contents**
+>>>>>>> origin/dpr_nvidia
 - [Project Structure](#project-structure)
 - [Setup](#setup)
 - [CUDA and GPU Acceleration](#cuda-and-gpu-acceleration)
@@ -31,6 +44,20 @@ Compared to the CPU version, the **GPU-optimized** implementation runs **10-100x
 - [License](#license)
 - [Contact](#contact)
 
+<<<<<<< HEAD
+## Project Structure
+
+```plaintext
+├── dpr_gpu_functions/
+    ├── set_parameters_gpu.py
+    ├── process_image_gpu.py
+    ├── dpr_stack_gpu.py
+    ├── dpr_update_single_gpu.py
+├── test_images/
+    ├── test_image.tif
+    ├── test_image.jpg
+    ├── test_image.png
+=======
 ---
 
 ## **Project Structure**
@@ -44,6 +71,7 @@ Compared to the CPU version, the **GPU-optimized** implementation runs **10-100x
 │   ├── test_image.tif
 │   ├── test_image.jpg
 │   ├── test_image.png
+>>>>>>> origin/dpr_nvidia
 ├── dpr_demo.py
 ├── README.md
 ```
@@ -79,10 +107,16 @@ or manually via:
 ```sh
 pip install numpy scipy Pillow tifffile imageio matplotlib cupy-cuda12x
 ```
+<<<<<<< HEAD
+*Replace `cupy-cuda12x` with the version corresponding to your installed CUDA toolkit (e.g., `cupy-cuda11x` for CUDA 11.x).* For more details, refer to [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).
+
+### 5. FIJI (Recommended for TIFF images):
+=======
 **Important:**
 *Replace `cupy-cuda12x` with the version that matches your installed CUDA toolkit (e.g., `cupy-cuda11x` for CUDA 11.x). To determine your CUDA version, refer to the [Confirm CUDA Installation](#confirm-cuda-installation) section. For more details, check the [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).*
 
 ### 5. FIJI (Optional):
+>>>>>>> origin/dpr_nvidia
 FIJI is recommended for viewing TIFF images clearly.
 
 - Download FIJI from the [official page](https://imagej.net/software/fiji/downloads).
