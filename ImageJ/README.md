@@ -18,7 +18,7 @@ DPR plugin for [Fiji](https://fiji.sc/). This plugin enhances image resolution b
 1. **Clone the repo:**
    ```sh
    git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
-   cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/FIJI_ImageJ
+   cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/ImageJ
    ```
 1. **Build the plugin JAR:**
    ```sh
