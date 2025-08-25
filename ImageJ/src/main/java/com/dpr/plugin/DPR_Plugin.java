@@ -16,28 +16,16 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * Implements the Displacement-Preserving Reconstruction (DPR) algorithm as an ImageJ plugin.
- *
- * <p>This plugin is a high-fidelity translation of the provided MATLAB DPR library.
- * It enhances image resolution by calculating pixel displacements based on local gradients
- * and remapping pixel intensities.
- *
- * <p><b>Primary Source (Source of Truth):</b> The core logic, function signatures, and
- * mathematical operations are derived from the provided MATLAB code.
- * <p><b>Secondary Source (Verification):</b> The Python code was used to cross-reference
- * and verify the understanding of the algorithm's behavior and data flow.
+ * Implements the DPR algorithm as an ImageJ plugin.
  */
 public class DPR_Plugin implements PlugIn {
 
-    /**
-     * A simple private static class (POJO) to hold DPR parameters, similar to a MATLAB struct.
-     */
+    /** Simple POJO for DPR parameters. */
     private static class DprOptions {
-        final double psf;
-        final double gain;
-        final int background; // Radius for local-minimum filter
-        final String temporal;
-
+        final double psf;        // PSF FWHM
+        final double gain;       // displacement gain
+        final int background;    // radius for local minimum filter
+        final String temporal;   // none | mean | var
         DprOptions(double psf, double gain, int background, String temporal) {
             this.psf = psf;
             this.gain = gain;
@@ -45,6 +33,12 @@ public class DPR_Plugin implements PlugIn {
             this.temporal = temporal;
         }
     }
+
+    // Dialog-captured fields
+    private static double psf;
+    private static double gain;
+    private static int background;
+    private static String temporal;
 
     @Override
     public void run(String arg) {
@@ -54,40 +48,27 @@ public class DPR_Plugin implements PlugIn {
             return;
         }
 
-        // --- Create User Dialog (GenericDialog) ---
         if (!showDialog()) {
-            return; // User cancelled the dialog
+            return; // user cancelled
         }
-        // These static fields are set by showDialog()
         DprOptions options = new DprOptions(psf, gain, background, temporal);
 
         IJ.showStatus("Running DPR Plugin...");
-        long startTime = System.currentTimeMillis();
+        long t0 = System.currentTimeMillis();
 
-        // --- Run DPR algorithm ---
-        // The results are returned as an array of ImagePlus objects
         ImagePlus[] results = dprStack(imp, options);
 
-        long endTime = System.currentTimeMillis();
-        IJ.showStatus("DPR processing finished in " + (endTime - startTime) + " ms.");
+        long t1 = System.currentTimeMillis();
+        IJ.showStatus("DPR processing finished in " + (t1 - t0) + " ms.");
 
-        // --- Display Results ---
         if (results != null) {
-            if(results[0] != null) results[0].show();
-            if(results[1] != null) results[1].show();
+            if (results[0] != null) results[0].show();   // DPR final
+            if (results[1] != null) results[1].show();   // magnified raw final
         }
     }
 
-    private static double psf;
-    private static double gain;
-    private static int background;
-    private static String temporal;
-
     /**
-     * Creates and shows a GenericDialog to get parameters from the user.
-     * Maps to the main script's parameter setting section.
-     *
-     * @return false if the user cancels the dialog, true otherwise.
+     * Parameter dialog.
      */
     private boolean showDialog() {
         GenericDialog gd = new GenericDialog("DPR Parameters");
@@ -98,153 +79,139 @@ public class DPR_Plugin implements PlugIn {
         gd.addChoice("Temporal Processing:", temporalOptions, "mean");
 
         gd.showDialog();
-        if (gd.wasCanceled()) {
-            return false;
-        }
+        if (gd.wasCanceled()) return false;
 
-        // Retrieve values from the dialog
         psf = gd.getNextNumber();
         gain = gd.getNextNumber();
         background = (int) gd.getNextNumber();
         temporal = gd.getNextChoice();
-
         return true;
     }
 
-
     /**
-     * Processes an entire image stack, potentially in parallel.
-     * Equivalent to MATLAB's `DPRStack.m`.
-     *
-     * @param imp     The input ImagePlus stack.
-     * @param options The DPR parameters.
-     * @return An array containing the DPR result ImagePlus and the magnified raw ImagePlus.
+     * Process an entire stack and return {DPR_result, magnified_raw}.
      */
     private ImagePlus[] dprStack(ImagePlus imp, DprOptions options) {
-        int nSlices = imp.getStackSize();
-        ImageStack inputStack = imp.getStack();
+        final int nSlices = imp.getStackSize();
+        final ImageStack inputStack = imp.getStack();
 
-        // Prepare futures list to hold results from parallel processing
+        // --- Compute output calibration (preserved for all results) ---
+        final Calibration originalCal = imp.getCalibration();
+        final Calibration newCal = originalCal.copy();
+        // Ensure unit is preserved; if missing/invalid, default to microns
+        String unit = originalCal.getUnit();
+        if (unit == null || unit.isEmpty() || unit.equalsIgnoreCase("pixel") || unit.equalsIgnoreCase("pixels")) {
+            unit = "µm"; // ImageJ-friendly; shows as microns in UI
+        }
+        newCal.setUnit(unit);
+
+        // Convert PSF FWHM to 1/e radius and compute magnification (≈ 5 px per PSF 1/e)
+        final double psf_1e = options.psf / 1.6651;
+        final double magnification = (psf_1e > 0) ? (5.0 / psf_1e) : 1.0; // guard div-by-zero
+
+        // Pixel size shrinks by the magnification
+        if (magnification > 0) {
+            newCal.pixelWidth  = originalCal.pixelWidth  / magnification;
+            newCal.pixelHeight = originalCal.pixelHeight / magnification;
+            // Units, z-spacing, frame interval, origins are preserved via copy()
+        }
+
+        // --- Parallel per-slice DPR ---
         List<Future<ImageProcessor[]>> futures = new ArrayList<>();
-        // Equivalent to MATLAB's `parfor`
         ExecutorService executor = Executors.newWorkStealingPool();
 
         for (int i = 1; i <= nSlices; i++) {
             final int sliceIndex = i;
-            Callable<ImageProcessor[]> task = () -> {
+            futures.add(executor.submit(() -> {
                 IJ.showProgress(sliceIndex, nSlices);
                 ImageProcessor ip = inputStack.getProcessor(sliceIndex).convertToFloat();
                 return dprUpdateSingle(ip, options);
-            };
-            futures.add(executor.submit(task));
+            }));
         }
 
         executor.shutdown();
         try {
-            executor.awaitTermination(1, TimeUnit.HOURS);
+            if (!executor.awaitTermination(1, TimeUnit.HOURS)) {
+                executor.shutdownNow();
+            }
         } catch (InterruptedException e) {
-            IJ.log("DPR processing was interrupted.");
+            IJ.log("DPR processing interrupted.");
             Thread.currentThread().interrupt();
             return null;
         }
 
-        // --- Collect results from all threads ---
+        // --- Collect results ---
         ImageStack dprResultStack = null;
         ImageStack magnifiedRawStack = null;
 
         try {
-            for (Future<ImageProcessor[]> future : futures) {
-                ImageProcessor[] resultPair = future.get(); // [I_DPR, raw_magnified]
+            for (Future<ImageProcessor[]> f : futures) {
+                ImageProcessor[] pair = f.get(); // [I_DPR, raw_magnified]
                 if (dprResultStack == null) {
-                    dprResultStack = new ImageStack(resultPair[0].getWidth(), resultPair[0].getHeight());
-                    magnifiedRawStack = new ImageStack(resultPair[1].getWidth(), resultPair[1].getHeight());
+                    dprResultStack = new ImageStack(pair[0].getWidth(), pair[0].getHeight());
+                    magnifiedRawStack = new ImageStack(pair[1].getWidth(), pair[1].getHeight());
                 }
-                dprResultStack.addSlice(resultPair[0]);
-                magnifiedRawStack.addSlice(resultPair[1]);
+                dprResultStack.addSlice(pair[0]);
+                magnifiedRawStack.addSlice(pair[1]);
             }
-        } catch (InterruptedException | ExecutionException e) {
-            IJ.handleException(e);
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            IJ.handleException(ie);
+            return null;
+        } catch (ExecutionException ee) {
+            IJ.handleException(ee);
             return null;
         }
 
-        // Correct Pixel Size Calibration. et original calibration from the input image
-        Calibration originalCal = imp.getCalibration();
-        Calibration newCal = originalCal.copy();
-
-        // Recalculate the magnification factor. This must match the logic in dprUpdateSingle.
-        final double psf_1e = options.psf / 1.6651;
-        final double magnification = (5.0 / psf_1e);
-
-        // Adjust the pixel size in the new calibration object.
-        // The physical size of a pixel gets smaller by the magnification factor.
-        if (magnification > 0) {
-            newCal.pixelWidth = originalCal.pixelWidth / magnification;
-            newCal.pixelHeight = originalCal.pixelHeight / magnification;
-        }
-
-        // --- Temporal Processing ---
-        // Equivalent to MATLAB's `DPRStack` temporal logic
+        // --- Temporal combine DPR stack ---
         ImagePlus dprFinalImage;
         if (nSlices > 1 && options.temporal.equalsIgnoreCase("mean")) {
             ImageProcessor meanIp = calculateMean(dprResultStack);
             dprFinalImage = new ImagePlus(imp.getShortTitle() + "_DPR_Mean", meanIp);
+            dprFinalImage.setCalibration(newCal); // attach calibration immediately
         } else if (nSlices > 1 && options.temporal.equalsIgnoreCase("var")) {
             ImageProcessor varIp = calculateVariance(dprResultStack);
             dprFinalImage = new ImagePlus(imp.getShortTitle() + "_DPR_Var", varIp);
+            dprFinalImage.setCalibration(newCal);
         } else {
             dprFinalImage = new ImagePlus(imp.getShortTitle() + "_DPR_Stack", dprResultStack);
+            dprFinalImage.setCalibration(newCal);
         }
-        dprFinalImage.setCalibration(newCal); // Apply the corrected calibration
 
-        // --- Create magnified raw result for comparison (always mean) ---
+        // --- Magnified raw (always mean) ---
         ImageProcessor magnifiedMean = calculateMean(magnifiedRawStack);
         ImagePlus magnifiedFinalImage = new ImagePlus(imp.getShortTitle() + "_Magnified_Mean", magnifiedMean);
-        magnifiedFinalImage.setCalibration(newCal); // Apply the corrected calibration
+        magnifiedFinalImage.setCalibration(newCal);
 
         return new ImagePlus[]{dprFinalImage, magnifiedFinalImage};
     }
 
     /**
-     * The core DPR algorithm for a single image frame.
-     * Equivalent to MATLAB's `DPR_UpdateSingle.m`.
-     *
-     * @param i_in    The input FloatProcessor for a single slice.
-     * @param options The DPR parameters.
-     * @return An array of two ImageProcessors: {I_out, I_magnified}.
+     * Single-frame DPR core. Returns {I_DPR, I_magnified} as ImageProcessors.
      */
     private ImageProcessor[] dprUpdateSingle(ImageProcessor i_in, DprOptions options) {
+        // --- Parameters ---
+        final double psf_1e = options.psf / 1.6651;             // FWHM -> 1/e radius
+        final int window_radius = options.background;            // local-min filter radius
 
-        // --- Parameter Setup ---
-        // Equivalent to MATLAB's: PSF = PSF/1.6651;
-        final double psf_1e = options.psf / 1.6651; // Convert FWHM to 1/e radius
-        final int window_radius = options.background;
-
-        // --- Image Upscaling Setup ---
-        // Equivalent to MATLAB's: linspace and meshgrid to define new dimensions
+        // --- Dimensions & target upscale ---
         final int initialWidth = i_in.getWidth();
         final int initialHeight = i_in.getHeight();
-
-        // upscaled image has ~5 pixels per PSF (1/e radius)
         final int newWidth = (int) Math.round(5 * initialWidth / psf_1e);
         final int newHeight = (int) Math.round(5 * initialHeight / psf_1e);
         final int PADDING = 10;
 
-        // --- Background Subtraction (Local Minimum Filter) ---
-        // Equivalent to MATLAB's: single_frame_I_in = I_in - min(I_in(:));
+        // --- Background subtraction (global min) ---
         ImageProcessor single_frame_I_in = i_in.duplicate();
         float minVal = Float.MAX_VALUE;
-        float[] pixels = (float[]) single_frame_I_in.getPixels();
-        for (float p : pixels) {
-            if (p < minVal) minVal = p;
-        }
+        float[] inPix = (float[]) single_frame_I_in.convertToFloat().getPixels();
+        for (float p : inPix) if (p < minVal) minVal = p;
         single_frame_I_in.add(-minVal);
 
-        // Equivalent to MATLAB's: I - local_min(I) loop
+        // --- Local-min filter and subtract ---
         ImageProcessor single_frame_I_in_localmin = localMinimumFilter(single_frame_I_in, window_radius);
 
-        // --- Upscale Images ---
-        // Equivalent to MATLAB's: interp2(..., 'spline', 0)
-        // We use ImageJ's BICUBIC as a high-quality approximation for spline interpolation.
+        // --- Upscale with bicubic (spline-like) ---
         ImageProcessor single_frame_localmin_magnified = single_frame_I_in_localmin.duplicate();
         single_frame_localmin_magnified.setInterpolationMethod(ImageProcessor.BICUBIC);
         single_frame_localmin_magnified = single_frame_localmin_magnified.resize(newWidth, newHeight, true);
@@ -253,42 +220,29 @@ public class DPR_Plugin implements PlugIn {
         single_frame_I_magnified.setInterpolationMethod(ImageProcessor.BICUBIC);
         single_frame_I_magnified = single_frame_I_magnified.resize(newWidth, newHeight, true);
 
-        // --- Post-interpolation processing and Padding ---
-        // Equivalent to MATLAB's: img(img < 0) = 0; img = padarray(img, [10 10], 0, 'both');
+        // --- Post-process & pad (clip negatives, zero-pad border) ---
         single_frame_localmin_magnified = postProcessAndPad(single_frame_localmin_magnified, PADDING);
         single_frame_I_magnified = postProcessAndPad(single_frame_I_magnified, PADDING);
 
         final int paddedWidth = single_frame_I_magnified.getWidth();
         final int paddedHeight = single_frame_I_magnified.getHeight();
 
-        // --- Local Normalization ---
-        // Equivalent to MATLAB's: I_normalized = single_frame_localmin_magnified./(imgaussfilt(...) + 0.00001);
+        // --- Local normalization: divide by Gaussian blur ---
         ImageProcessor blurredIp = single_frame_localmin_magnified.duplicate();
         GaussianBlur gb = new GaussianBlur();
-        gb.blurFloat((FloatProcessor)blurredIp, 10, 10, 0.01); // Sigma = 10
+        gb.blurFloat((FloatProcessor) blurredIp, 10, 10, 0.01); // sigmaX=sigmaY=10
 
         ImageProcessor I_normalized = single_frame_localmin_magnified.duplicate();
         float[] normPix = (float[]) I_normalized.getPixels();
         float[] blurPix = (float[]) blurredIp.getPixels();
-        for(int i = 0; i < normPix.length; i++) {
+        for (int i = 0; i < normPix.length; i++) {
             normPix[i] = normPix[i] / (blurPix[i] + 1e-5f);
         }
 
-        // --- Calculate Normalized Gradients ---
-        // Equivalent to MATLAB's: imfilter(I_normalized, sobel, 'conv', 'replicate');
+        // --- Sobel gradients (note MATLAB conv kernel orientation comments) ---
         Convolver convolver = new Convolver();
-        // NOTE: MATLAB's 'conv' flips the kernel, so we use the standard kernels directly.
-        // The assignment of X and Y gradients is intentionally swapped to match the MATLAB source exactly.
-        float[] sobelX_kernel = {
-                -1f,  0f,  1f,
-                -2f,  0f,  2f,
-                -1f,  0f,  1f
-        };  // For gradient Y in MATLAB
-        float[] sobelY_kernel = {
-                -1f, -2f, -1f,
-                 0f,  0f,  0f,
-                 1f,  2f,  1f
-        };  // For gradient X in MATLAB
+        float[] sobelX_kernel = { -1f, 0f, 1f, -2f, 0f, 2f, -1f, 0f, 1f }; // used for gradient Y in MATLAB
+        float[] sobelY_kernel = { -1f, -2f, -1f, 0f, 0f, 0f, 1f, 2f, 1f }; // used for gradient X in MATLAB
 
         ImageProcessor gradient_y = I_normalized.duplicate();
         convolver.convolve(gradient_y, sobelX_kernel, 3, 3);
@@ -296,29 +250,25 @@ public class DPR_Plugin implements PlugIn {
         ImageProcessor gradient_x = I_normalized.duplicate();
         convolver.convolve(gradient_x, sobelY_kernel, 3, 3);
 
-        // --- Normalize Gradients ---
-        // Equivalent to MATLAB's: gradient_x = gradient_x./(I_normalized+0.00001);
+        // --- Normalize gradients by intensity ---
         float[] gradXPix = (float[]) gradient_x.getPixels();
         float[] gradYPix = (float[]) gradient_y.getPixels();
-        for(int i = 0; i < normPix.length; i++) {
+        for (int i = 0; i < normPix.length; i++) {
             gradXPix[i] /= (normPix[i] + 1e-5f);
             gradYPix[i] /= (normPix[i] + 1e-5f);
         }
 
-        // --- Calculate Pixel Displacements ---
-        // Equivalent to MATLAB's: displacement_x = gain_value * gradient_x;
+        // --- Displacements ---
         final float gain_value = (float) (0.5 * options.gain + 1.0);
-        ImageProcessor displacement_x = gradient_x; // Reuse processor
-        ImageProcessor displacement_y = gradient_y; // Reuse processor
+        ImageProcessor displacement_x = gradient_x; // reuse
+        ImageProcessor displacement_y = gradient_y; // reuse
         displacement_x.multiply(gain_value);
         displacement_y.multiply(gain_value);
 
-        // Limit displacements: displacement(abs(displacement)>10) = 0;
         limitAbsoluteValues(displacement_x, 10);
         limitAbsoluteValues(displacement_y, 10);
 
-        // --- Calculate Final Image with Weighted Pixel Displacements ---
-        // This is the direct translation of the most complex loop in DPR_UpdateSingle.m
+        // --- Resample / accumulate using bilinear weights and integer steps ---
         FloatProcessor single_frame_I_out = new FloatProcessor(paddedWidth, paddedHeight);
         float[] outPixels = (float[]) single_frame_I_out.getPixels();
         float[] magPixels = (float[]) single_frame_I_magnified.getPixels();
@@ -334,13 +284,11 @@ public class DPR_Plugin implements PlugIn {
                 float dx_abs_frac = Math.abs(dx - (int) dx);
                 float dy_abs_frac = Math.abs(dy - (int) dy);
 
-                // Calculate weights for the 4 neighboring pixels
                 float w1 = (1 - dx_abs_frac) * (1 - dy_abs_frac);
                 float w2 = (1 - dx_abs_frac) * dy_abs_frac;
                 float w3 = dx_abs_frac * (1 - dy_abs_frac);
                 float w4 = dx_abs_frac * dy_abs_frac;
 
-                // Calculate integer coordinates for the 4 neighbors
                 int c1x = (int) dx;
                 int c1y = (int) dy;
                 int c2x = (int) dx;
@@ -350,36 +298,24 @@ public class DPR_Plugin implements PlugIn {
                 int c4x = (int) dx + (int) Math.signum(dx);
                 int c4y = (int) dy + (int) Math.signum(dy);
 
-                // Distribute the intensity of the current pixel to its new locations
-                float currentPixelValue = magPixels[index];
-                outPixels[(nx + c1x) * paddedWidth + (ny + c1y)] += w1 * currentPixelValue;
-                outPixels[(nx + c2x) * paddedWidth + (ny + c2y)] += w2 * currentPixelValue;
-                outPixels[(nx + c3x) * paddedWidth + (ny + c3y)] += w3 * currentPixelValue;
-                outPixels[(nx + c4x) * paddedWidth + (ny + c4y)] += w4 * currentPixelValue;
+                float v = magPixels[index];
+                outPixels[(nx + c1x) * paddedWidth + (ny + c1y)] += w1 * v;
+                outPixels[(nx + c2x) * paddedWidth + (ny + c2y)] += w2 * v;
+                outPixels[(nx + c3x) * paddedWidth + (ny + c3y)] += w3 * v;
+                outPixels[(nx + c4x) * paddedWidth + (ny + c4y)] += w4 * v;
             }
         }
 
-        // --- Crop final images to remove padding ---
-        // Equivalent to MATLAB's: single_frame_I_out(11:end-10,11:end-10)
+        // --- Crop off padding ---
         single_frame_I_out.setRoi(PADDING, PADDING, newWidth, newHeight);
         single_frame_I_magnified.setRoi(PADDING, PADDING, newWidth, newHeight);
 
-        return new ImageProcessor[]{single_frame_I_out.crop(), single_frame_I_magnified.crop()};
+        return new ImageProcessor[]{ single_frame_I_out.crop(), single_frame_I_magnified.crop() };
     }
 
-    // =====================================================================================
-    // MANDATORY HELPER FUNCTIONS
-    // These methods replicate MATLAB functionality not directly available in ImageJ.
-    // =====================================================================================
+    // ===================== Helper functions =====================
 
-    /**
-     * Helper function to replicate MATLAB's local minimum filtering loop.
-     * For each pixel, it finds the minimum value in a square window around it.
-     *
-     * @param ip The input processor.
-     * @param radius The radius of the search window.
-     * @return A new ImageProcessor containing the local minimum values.
-     */
+    /** Local minimum filter; returns I(x,y) - localMin(x,y) within a square window. */
     private ImageProcessor localMinimumFilter(ImageProcessor ip, int radius) {
         int width = ip.getWidth();
         int height = ip.getHeight();
@@ -387,19 +323,16 @@ public class DPR_Plugin implements PlugIn {
         float[] outPixels = (float[]) outIp.getPixels();
 
         for (int y = 0; y < height; y++) {
+            int u_min = Math.max(0, y - radius);
+            int u_max = Math.min(height - 1, y + radius);
             for (int x = 0; x < width; x++) {
-                int u_min = Math.max(0, y - radius);
-                int u_max = Math.min(height - 1, y + radius);
                 int v_min = Math.max(0, x - radius);
                 int v_max = Math.min(width - 1, x + radius);
-
                 float localMin = Float.MAX_VALUE;
                 for (int u = u_min; u <= u_max; u++) {
                     for (int v = v_min; v <= v_max; v++) {
                         float val = ip.getPixelValue(v, u);
-                        if (val < localMin) {
-                            localMin = val;
-                        }
+                        if (val < localMin) localMin = val;
                     }
                 }
                 outPixels[y * width + x] = ip.getPixelValue(x, y) - localMin;
@@ -408,90 +341,58 @@ public class DPR_Plugin implements PlugIn {
         return outIp;
     }
 
-    /**
-     * Helper to set negative values to zero and pad the image.
-     * Replicates `img(img<0)=0;` and `padarray(img, [pad,pad], 0, 'both');`
-     * @param ip Input processor
-     * @param padding Amount of padding on each side
-     * @return A new, processed, and padded ImageProcessor
-     */
+    /** Clip negatives to 0 and zero-pad by {@code padding} on all sides. */
     private ImageProcessor postProcessAndPad(ImageProcessor ip, int padding) {
         float[] pixels = (float[]) ip.getPixels();
-        for (int i = 0; i < pixels.length; i++) {
-            if (pixels[i] < 0) {
-                pixels[i] = 0;
-            }
-        }
-
+        for (int i = 0; i < pixels.length; i++) if (pixels[i] < 0) pixels[i] = 0;
         int newWidth = ip.getWidth() + 2 * padding;
         int newHeight = ip.getHeight() + 2 * padding;
-        FloatProcessor paddedIp = new FloatProcessor(newWidth, newHeight);
-        paddedIp.insert(ip, padding, padding);
-        return paddedIp;
+        FloatProcessor padded = new FloatProcessor(newWidth, newHeight);
+        padded.insert(ip, padding, padding);
+        return padded;
     }
 
-    /**
-     * Helper to limit the absolute values in a processor.
-     * Replicates `disp(abs(disp)>limit)=0;`
-     * @param ip The processor to modify in-place.
-     * @param limit The absolute value limit.
-     */
+    /** Hard-limit absolute values in-place (|p|>limit -> 0). */
     private void limitAbsoluteValues(ImageProcessor ip, float limit) {
         float[] pixels = (float[]) ip.getPixels();
         for (int i = 0; i < pixels.length; i++) {
-            if (Math.abs(pixels[i]) > limit) {
-                pixels[i] = 0;
-            }
+            if (Math.abs(pixels[i]) > limit) pixels[i] = 0;
         }
     }
 
-    /**
-     * Helper to calculate the mean projection of a stack.
-     * @param stack The stack to process.
-     * @return A single ImageProcessor with the mean pixel values.
-     */
+    /** Mean projection of a stack. */
     private ImageProcessor calculateMean(ImageStack stack) {
         int width = stack.getWidth();
         int height = stack.getHeight();
         int n = stack.getSize();
         FloatProcessor meanIp = new FloatProcessor(width, height);
-        float[] meanPixels = (float[]) meanIp.getPixels();
-
+        float[] mean = (float[]) meanIp.getPixels();
         for (int i = 1; i <= n; i++) {
-            float[] slicePixels = (float[]) stack.getProcessor(i).getPixels();
-            for (int j = 0; j < meanPixels.length; j++) {
-                meanPixels[j] += slicePixels[j];
-            }
+            float[] s = (float[]) stack.getProcessor(i).getPixels();
+            for (int j = 0; j < mean.length; j++) mean[j] += s[j];
         }
         meanIp.multiply(1.0 / n);
         return meanIp;
     }
 
-    /**
-     * Helper to calculate the variance projection of a stack.
-     * @param stack The stack to process.
-     * @return A single ImageProcessor with the variance of pixel values.
-     */
+    /** Sample variance projection of a stack. */
     private ImageProcessor calculateVariance(ImageStack stack) {
         int width = stack.getWidth();
         int height = stack.getHeight();
         int n = stack.getSize();
         if (n <= 1) return stack.getProcessor(1);
-
         FloatProcessor meanIp = (FloatProcessor) calculateMean(stack);
-        float[] meanPixels = (float[]) meanIp.getPixels();
-
+        float[] mean = (float[]) meanIp.getPixels();
         FloatProcessor varIp = new FloatProcessor(width, height);
-        float[] varPixels = (float[]) varIp.getPixels();
-
+        float[] var = (float[]) varIp.getPixels();
         for (int i = 1; i <= n; i++) {
-            float[] slicePixels = (float[]) stack.getProcessor(i).getPixels();
-            for (int j = 0; j < varPixels.length; j++) {
-                float diff = slicePixels[j] - meanPixels[j];
-                varPixels[j] += diff * diff;
+            float[] s = (float[]) stack.getProcessor(i).getPixels();
+            for (int j = 0; j < var.length; j++) {
+                float d = s[j] - mean[j];
+                var[j] += d * d;
             }
         }
-        varIp.multiply(1.0 / (n - 1)); // Use sample variance
+        varIp.multiply(1.0 / (n - 1));
         return varIp;
     }
 }
