@@ -3,9 +3,9 @@
 
 ## Overview
 
-This directory contains the Python implementation of the `Deblurring by Pixel Reassignment (DPR)` algorithm. It is designed to run on most environments, including Windows, macOS (MacBook), and others. If your device does not have an NVIDIA GPU, this CPU-based version is best suited for you.
+This directory contains the CPU Python implementation of the `Deblurring by Pixel Reassignment (DPR)` algorithm. It is intended for systems where the NVIDIA GPU implementation is not available.
 
-The library supports various image formats, such as TIFF, JPEG, and PNG. Key features include loading image stacks, applying the DPR algorithm, and saving the enhanced output.
+The demo is configured for the sample images in `test_images/`. The processing code reads TIFF files and image files supported by Pillow.
 
 ## Table of Contents
 
@@ -20,11 +20,15 @@ The library supports various image formats, such as TIFF, JPEG, and PNG. Key fea
 ├── dpr_function/
     ├── dpr_set_parameters.py
     ├── process_image.py
+    ├── process_image_ml_denoise.py
+    ├── dpr_stack.py
+    ├── dpr_update_single.py
 ├── test_images/
     ├── test_image.tif
-    ├── test_image.jpg
-    ├── test_image.png
-├── main.py
+    ├── sarcomere.tif
+    ├── test_image_jpg.jpg
+    ├── sarcomere_jpg.jpg
+├── dpr_demo.py
 ├── README.md
 ```
 
@@ -40,8 +44,8 @@ Before getting started, ensure you have the following requirements:
 1. **Clone the repository:**
 
     ```bash
-    git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
-    cd Resolution_Enhancement_With_Deblurring-main/dpr_python
+    git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
+    cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_basic
     ```
 1. Upgrade the pip version
     ```sh
@@ -88,8 +92,7 @@ Before getting started, ensure you have the following requirements:
     -   Open jpg/png files using any standard image viewer to inspect the enhanced images. For TIFF files, use FIJI for best compatibility and analysis. For more information on how to download and use FIJI, please check the FIJI section in the [Setup](#setup).
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the repository-level [LICENSE](../../LICENSE) file for details.
 
 ## Contact
 If you have any questions or need further assistance, please open an issue in the repository, and we will be happy to help.
-

@@ -1,6 +1,6 @@
 # MATLAB Tools for the DPR Algorithm
 
-Welcome to the MATLAB section of the "Resolution Enhancement With Deblurring" project. This part of the repository contains MATLAB scripts designed to deblur and enhance the resolution of images, particularly useful in biomicroscopy and other scientific imaging applications.
+This directory contains MATLAB scripts and functions for Deblurring by Pixel Reassignment (DPR).
 
 ## Getting Started
 
@@ -15,8 +15,8 @@ Welcome to the MATLAB section of the "Resolution Enhancement With Deblurring" pr
    
    If you have not already cloned the entire project repository, you can clone it or just download this specific MATLAB directory.
      ```bash
-     git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
-     cd Resolution_Enhancement_With_Deblurring/MatLab
+     git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
+     cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/MatLab
      ```
 1. **Set Up MATLAB**
    
@@ -51,7 +51,7 @@ The repository comprises the Matlab functions for DPR
     This function is used to process an image stack.
   - DPR_UpdateSingle_mex.mexw64
     This function is used to process a single image and is developed for Windows computer using 64bits Matlab.
-  - DPR_UpdateSingle_mex.maci64
+  - DPR_UpdateSingle_mex.mexmaci64
     This function is used to process a single image and is developed for Macbook using Matlab.
   - DPR_UpdateSingle.m
     This is the source code for DPR.
@@ -66,7 +66,7 @@ The repository comprises the Matlab functions for DPR
 Contributions are welcome! If you have improvements, bug fixes, or enhancements, please fork the repository, make your changes, and submit a pull request. For significant changes, please open an issue first to discuss what you would like to change.
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/LICENSE) file for details.
+This project is licensed under the MIT License. See the repository-level [LICENSE](../LICENSE) file for details.
 
 ## Contact
 If you have any questions or need further assistance, please open an issue in the repository, and we will be happy to help.

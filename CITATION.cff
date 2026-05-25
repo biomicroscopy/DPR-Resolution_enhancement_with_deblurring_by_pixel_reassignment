@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this software or method in your research, please cite the DPR paper."
+title: "Resolution Enhancement Algorithm - Deblurring by Pixel Reassignment (DPR)"
+type: software
+authors:
+  - family-names: Zhao
+    given-names: B.
+  - family-names: Mertz
+    given-names: J.
+license: MIT
+repository-code: "https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Zhao
+      given-names: B.
+    - family-names: Mertz
+      given-names: J.
+  title: "Resolution enhancement with deblurring by pixel reassignment (DPR)"
+  journal: "Advanced Photonics"
+  year: 2023
+  volume: 5
+  issue: 6
+  doi: "10.1117/1.AP.5.6.066004"

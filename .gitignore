@@ -3,6 +3,13 @@
 
 # Python virtual environment
 venv/
+__pycache__/
+*.py[cod]
 
 .Rhistory
 .idea/
+
+# Java/Maven build outputs
+target/
+bin/
+*.class

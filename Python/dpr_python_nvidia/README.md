@@ -1,9 +1,7 @@
 # **DPR Algorithm (GPU-Optimized Python Version)**
 
 ## **Overview**
-This repository provides a **GPU-accelerated** implementation of the [Deblurring by Pixel Reassignment](https://www.spiedigitallibrary.org/journals/advanced-photonics/volume-5/issue-06/066004/Resolution-enhancement-with-deblurring-by-pixel-reassignment/10.1117/1.AP.5.6.066004.full?webSyncID=100c5e17-3e55-b558-b001-3d8b3bd4461b&sessionGUID=d75b2c3e-257a-52be-e460-867d9b436758#_=_) (DPR) algorithm. It supports TIFF, JPEG, and PNG image formats and uses NVIDIA CUDA to enhance processing speed.
-
-Compared to the CPU version, the GPU-optimized implementation runs **10-100x faster**, depending on the image size and hardware.
+This directory provides an NVIDIA GPU implementation of the [Deblurring by Pixel Reassignment](https://doi.org/10.1117/1.AP.5.6.066004) (DPR) algorithm using CuPy.
 
 ## Hardware Requirements
 This version requires a **computer with an NVIDIA GPU** (e.g., RTX 3080, Tesla V100).
@@ -15,10 +13,13 @@ If your system **does not** have an NVIDIA GPU (e.g., MacBook, AMD GPU), use the
 │   ├── set_parameters_gpu.py
 │   ├── process_image_gpu.py
 │   ├── dpr_stack_gpu.py
-│   ├── dpr_update_single_gpu.py
+│   ├── update_single_gpu.py
 ├── test_images/
-│   ├── DPR_results/
-├── dpr_demo.py
+│   ├── test_image.tif
+│   ├── sarcomere.tif
+│   ├── test_image_jpg.jpg
+│   ├── sarcomere_jpg.jpg
+├── dpr_gpu_demo.py
 ├── README.md
 ```
 
@@ -35,8 +36,8 @@ If you don't have Python installed, download it from [python.org](https://www.py
 
 ### 2. Clone the repository:
 ```bash
-git clone https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring.git
-cd Resolution_Enhancement_With_Deblurring-main/dpr_python
+git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
+cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_nvidia
 ```
 
 ### 3. Upgrade pip:
@@ -54,8 +55,7 @@ or manually via:
 pip install numpy scipy Pillow tifffile imageio matplotlib cupy-cuda12x
 ```
 
-**Important:**
-*Replace `cupy-cuda12x` with the version that matches your installed CUDA toolkit (e.g., `cupy-cuda11x` for CUDA 11.x). To determine your CUDA version, refer to the [Confirm CUDA Installation](#confirm-cuda-installation) section. For more details, check the [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).*
+**Important:** `requirements.txt` uses `cupy-cuda12x`. Replace it with the CuPy package that matches your CUDA installation if needed, for example `cupy-cuda11x` for CUDA 11.x. To determine your CUDA version, refer to the [Confirm CUDA Installation](#confirm-cuda-installation) section. For more details, check the [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).
 
 ### 5. FIJI (Optional):
 FIJI is recommended for viewing TIFF images.
@@ -91,7 +91,7 @@ Ensure your CuPy installation matches your CUDA version as mentioned earlier.
 ### Running the Demo:
 Execute the DPR processing demo script:
 ```bash
-python dpr_demo_nvidia.py
+python dpr_gpu_demo.py
 ```
 
 ### Provide Input Parameters:
@@ -105,7 +105,7 @@ python dpr_demo_nvidia.py
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](https://github.com/biomicroscopy/Resolution_Enhancement_With_Deblurring/blob/main/LICENSE) for details.
+This project is licensed under the MIT License. See the repository-level [LICENSE](../../LICENSE) file for details.
 
 ## Contact
 

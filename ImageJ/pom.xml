@@ -3,14 +3,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.mycompany.imagej</groupId>
+    <groupId>io.github.biomicroscopy</groupId>
     <artifactId>dpr-plugin</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>DPR ImageJ Plugin</name>
-    <description>Displacement-Preserving Reconstruction (DPR) ImageJ plugin</description>
-    <url>http://www.mycompany.com/imagej/dpr-plugin</url>
+    <description>Deblurring by Pixel Reassignment (DPR) ImageJ plugin</description>
+    <url>https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/mit/</url>
+        </license>
+    </licenses>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

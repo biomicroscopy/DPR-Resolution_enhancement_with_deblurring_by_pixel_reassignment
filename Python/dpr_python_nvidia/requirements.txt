@@ -4,7 +4,4 @@ pillow
 tifffile
 imageio
 matplotlib
-<<<<<<< HEAD
-=======
-cupy
->>>>>>> origin/dpr_nvidia
+cupy-cuda12x

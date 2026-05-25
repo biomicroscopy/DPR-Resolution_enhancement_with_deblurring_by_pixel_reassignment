@@ -1,9 +1,9 @@
 # DPR Algorithm Implementations in Python
 
-This directory contains two versions of the **Deblurring by Pixel Reassignment (DPR)** algorithm implemented in Python:
+This directory contains two Python implementations of the **Deblurring by Pixel Reassignment (DPR)** algorithm:
 
-- 🖥️ **dpr_python_basic**: CPU-based implementation, compatible with most environments  
-- ⚡ **dpr_python_nvidia**: GPU-accelerated implementation using NVIDIA CUDA and CuPy  
+- **dpr_python_basic**: CPU-based implementation.
+- **dpr_python_nvidia**: NVIDIA GPU implementation using CuPy.
 
 ## 📁 Repository Structure
 
@@ -24,35 +24,30 @@ Python/
 └── README.md                # You're here!
 ```
 
-## 🖥️ CPU-Based Version: `dpr_python_basic`
+## CPU-Based Version: `dpr_python_basic`
 
-- Works on most computers, including Windows, Linux, and Mac.
+- Runs without CUDA.
 - No GPU or CUDA required.
-- Easy to set up and run with standard Python libraries.
 
-> 📄 See [`dpr_python_basic/README.md`](./dpr_python_basic/README.md) for setup and usage.
+See [`dpr_python_basic/README.md`](./dpr_python_basic/README.md) for setup and usage.
 
-## ⚡ GPU-Based Version: `dpr_python_nvidia`
+## GPU-Based Version: `dpr_python_nvidia`
 
 - Designed for computers with an NVIDIA GPU.
 - Uses CuPy for GPU acceleration.
-- Much faster than the CPU version, especially on large images.
 
-> 📄 See [`dpr_python_nvidia/README.md`](./dpr_python_nvidia/README.md) for installation, dependencies, and usage instructions.
+See [`dpr_python_nvidia/README.md`](./dpr_python_nvidia/README.md) for installation, dependencies, and usage instructions.
 
-## 🖼️ Supported Image Formats
+## Input Images
 
-Both versions support:
-- TIFF (.tif)
-- JPEG (.jpg)
-- PNG (.png)
+Sample input images are provided in each implementation's `test_images/` directory. See the implementation-specific README files for usage instructions.
 
-## 🛠 Getting Started
+## Getting Started
 
 1. Choose the appropriate version based on your system.
 2. Follow the individual README in the subdirectory to install dependencies and run the demo.
 3. Use the provided test images or apply DPR to your own stack.
 
-## 🤝 Contributing
+## Contributing
 
 Feel free to open an issue or submit a pull request if you have improvements, bug fixes, or feature suggestions.
