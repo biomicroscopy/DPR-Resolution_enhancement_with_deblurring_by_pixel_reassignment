@@ -1,98 +1,150 @@
+# DPR Python Basic
 
-# Python Tools for the DPR Algorithm
+CPU-only Python version of Deblurring by Pixel Reassignment (DPR). Use this
+version if you do not have an NVIDIA GPU, or if you just want the simplest way
+to process an image.
 
-## Overview
+## Quick Start
 
-This directory contains the CPU Python implementation of the `Deblurring by Pixel Reassignment (DPR)` algorithm. It is intended for systems where the NVIDIA GPU implementation is not available.
+From a terminal, run:
 
-The demo is configured for the sample images in `test_images/`. The processing code reads TIFF files and image files supported by Pillow.
+```bash
+git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
+cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_basic
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 dpr_demo.py --input test_images/test_image.tif
+```
 
-## Table of Contents
+If you already cloned the repository, start at the `cd` command.
 
-- [Project Structure](#project-structure)
-- [Setup](#setup)
-- [Usage](#usage)
-- [License](#license)
+The result is written to:
+
+```text
+test_images/DPR_results/test_image_result.tif
+```
+
+Open TIFF results in FIJI/ImageJ for best compatibility. JPG and PNG results
+can be opened with any normal image viewer.
+
+## Process Your Own Image
+
+Use `--input` with the path to your image:
+
+```bash
+python3 dpr_demo.py --input /path/to/my_image.tif
+```
+
+By default, the output is saved in a `DPR_results` folder next to the input
+image, and `_result` is added to the filename.
+
+To choose the output folder and format:
+
+```bash
+python3 dpr_demo.py \
+  --input /path/to/my_image.tif \
+  --output-dir /path/to/output_folder \
+  --output-format tif
+```
+
+Supported output formats include `tif`, `jpg`, and `png`.
+
+## Common Parameters
+
+The default parameters are a good starting point:
+
+```bash
+python3 dpr_demo.py \
+  --input test_images/test_image.tif \
+  --psf 4 \
+  --gain 2 \
+  --background 10 \
+  --temporal mean
+```
+
+- `--psf`: point spread function FWHM in pixels. Default: `4`.
+- `--gain`: DPR enhancement gain. Default: `2`.
+- `--background`: background subtraction radius parameter. Default: `10`.
+- `--temporal`: stack reduction mode. Use `mean`, `var`, or `none`. Default:
+  `mean`.
+
+Use `--temporal none` if you want to save the full DPR stack instead of a
+single reduced image.
+
+## Interactive Mode
+
+You can also run the demo without command-line arguments:
+
+```bash
+python3 dpr_demo.py
+```
+
+Interactive mode asks for the input file and parameters. It expects the input
+image to be inside:
+
+```text
+Python/dpr_python_basic/test_images/
+```
+
+Interactive mode also offers the optional ML-based denoising path. The
+non-interactive command-line path runs standard DPR processing only.
+
+## Input Files
+
+Sample files are included in `test_images/`:
+
+- `test_image.tif`
+- `sarcomere.tif`
+- `test_image_jpg.jpg`
+- `sarcomere_jpg.jpg`
+
+For your own data, pass the full file path with `--input`. TIFF stacks and
+standard Pillow-readable image files such as JPG and PNG are supported.
+
+## Troubleshooting
+
+If `python3` is not found, install Python 3.7 or newer from
+https://www.python.org/downloads/.
+
+If package installation fails, make sure your virtual environment is active and
+run:
+
+```bash
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+```
+
+If the script cannot find your image, pass an absolute path:
+
+```bash
+python3 dpr_demo.py --input /full/path/to/image.tif
+```
+
+If TIFF output does not open correctly in your default image viewer, use FIJI:
+https://imagej.net/software/fiji/downloads
 
 ## Project Structure
 
-```plaintext
-├── dpr_function/
-    ├── dpr_set_parameters.py
-    ├── process_image.py
-    ├── process_image_ml_denoise.py
-    ├── dpr_stack.py
-    ├── dpr_update_single.py
-├── test_images/
-    ├── test_image.tif
-    ├── sarcomere.tif
-    ├── test_image_jpg.jpg
-    ├── sarcomere_jpg.jpg
-├── dpr_demo.py
-├── README.md
+```text
+dpr_python_basic/
+|-- dpr_demo.py
+|-- requirements.txt
+|-- dpr_function/
+|   |-- dpr_set_parameters.py
+|   |-- dpr_stack.py
+|   |-- dpr_update_single.py
+|   |-- process_image.py
+|   `-- process_image_ml_denoise.py
+`-- test_images/
+    |-- test_image.tif
+    |-- sarcomere.tif
+    |-- test_image_jpg.jpg
+    `-- sarcomere_jpg.jpg
 ```
 
-## Setup
-
-Before getting started, ensure you have the following requirements:
-1. **Python 3.7 or higher**
-    Verify Python installation and version: 
-    ```sh
-    python3 --version
-    ```
-    If you don't have Python 3 installed, you can download it from [python.org](https://www.python.org/downloads/).
-1. **Clone the repository:**
-
-    ```bash
-    git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
-    cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_basic
-    ```
-1. Upgrade the pip version
-    ```sh
-    pip install --upgrade pip
-    ```
-1. **Required Python packages**
-    Install the necessary packages by running:
-    ```sh
-    pip install -r requirements.txt
-    ```
-    or run the below CLI
-    ```sh
-    pip install numpy scipy Pillow tifffile imageio matplotlib
-    ```
-1. **FIJI**
-
-   If you are processing TIFF (e.g. test_image.tif) files, it is recommended to use FIJI for viewing the results. FIJI is an enhanced version of ImageJ, bundled with many plugins to facilitate scientific image analysis.
-    1. Download FIJI:
-       - Visit the FIJI [download page](https://imagej.net/software/fiji/downloads).
-       - Choose the appropriate version for your operating system (Windows, MacOS, or Linux).
-    1. Install FIJI:
-       - Follow the instructions provided on the download page to install FIJI on your system.
-    1. Open Your TIFF Files:
-       - After installing FIJI, you can open the TIFF files by simply dragging and dropping them onto the FIJI front end.
-
-## Usage
-1. Run the Demo script
-
-    To run the DPR processing demo, use the `dpr_demo.py` script. The parameters have been configured in the script.
-
-    ```bash
-    python3 dpr_demo.py
-    ```
-1. Provide the requested information:
-
-    - File Name with Type: You will be prompted to enter the image file name with its type (e.g., test_image.tif). Press Enter to use the default value.
-    - Use Default Parameters: You will be asked if you want to use the default DPR parameters. Press Enter to use the default values for psf, gain, background, and temporal.
-    - Custom Parameters: If you choose not to use the default parameters, you will need to provide custom values for each parameter as prompted.
-
-    For a demo, please use the default variables.
-1. Check the Image process result
-    -   The processed images will be saved in a directory named `DPR_results` inside the `test_images`.
-    -   The saved image files will have `_result` appended to their original names.
-    -   Open jpg/png files using any standard image viewer to inspect the enhanced images. For TIFF files, use FIJI for best compatibility and analysis. For more information on how to download and use FIJI, please check the FIJI section in the [Setup](#setup).
-
 ## License
-This project is licensed under the MIT License. See the repository-level [LICENSE](../../LICENSE) file for details.
 
-## Contact
-If you have any questions or need further assistance, please open an issue in the repository, and we will be happy to help.
+This project is licensed under the MIT License. See the repository-level
+[LICENSE](../../LICENSE) file for details.

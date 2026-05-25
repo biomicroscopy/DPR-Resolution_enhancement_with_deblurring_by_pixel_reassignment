@@ -7,7 +7,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 def dpr_set_parameters(psf, **kwargs):
     """
-    Set parameters for Displacement-Preserving Reconstruction (DPR).
+    Set parameters for Deblurring by Pixel Reassignment (DPR).
 
     Parameters:
     - psf: Point Spread Function (PSF) full width at half maximum (FWHM) in pixels

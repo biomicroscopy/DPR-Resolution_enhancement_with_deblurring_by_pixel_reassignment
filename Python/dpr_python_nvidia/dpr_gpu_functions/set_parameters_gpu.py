@@ -4,7 +4,7 @@ import numpy as np
 
 def set_parameters(psf, **kwargs):
     """
-    Set parameters for Displacement-Preserving Reconstruction (DPR).
+    Set parameters for Deblurring by Pixel Reassignment (DPR).
 
     Parameters:
         psf (float): PSF full width at half maximum in pixels.

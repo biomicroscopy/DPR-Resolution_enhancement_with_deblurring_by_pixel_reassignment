@@ -6,9 +6,9 @@ import tifffile as tiff
 from PIL import Image
 
 
-def process_image(data_folder, file_name, file_type, psf, options):
+def process_image(data_folder, file_name, file_type, psf, options, output_dir=None, output_format=None):
     """
-    Process and enhance a stack of images using the DPR (Deconvolution and Pixel Restoration) algorithm.
+    Process and enhance a stack of images using the Deblurring by Pixel Reassignment (DPR) algorithm.
 
     Parameters:
     - data_folder (str): Directory path where the input image files are located and where results will be saved.
@@ -16,6 +16,8 @@ def process_image(data_folder, file_name, file_type, psf, options):
     - file_type (str): File extension/type of the images to be processed (e.g., 'tif', 'jpg', 'png').
     - psf (float): Point Spread Function (PSF) value used for deconvolution in the DPR algorithm.
     - options (dict): Dictionary of options for the DPR algorithm. It must include keys such as 'gain', 'background', and 'temporal'.
+    - output_dir (str, optional): Directory where the result will be saved.
+    - output_format (str, optional): File format for the result. Defaults to the input file type.
 
     Returns:
     - None: The function performs in-place operations and saves results to disk.
@@ -27,18 +29,22 @@ def process_image(data_folder, file_name, file_type, psf, options):
     """
     print(f"Starting DPR demo.")
 
+    input_path = os.path.abspath(os.path.join(data_folder, f'{file_name}.{file_type}'))
+
     # Load the image stack to determine the number of frames
     try:
         image_stack = load_image_stack(data_folder, file_name, file_type)
-        print(f"Loaded input image stack from \"{data_folder}/{file_name}.{file_type}\":"
-              f" {image_stack.shape} - dimensions(height, width, frames)")
+        print(f"Loaded input image stack: {image_stack.shape} - dimensions(height, width, frames)")
+        print(f"Input image: \"{input_path}\"")
     except Exception as e:
         logging.error(f"Error loading images: {e}")
         return
 
     # Prepare the folder for saving DPR-enhanced images
-    save_folder = os.path.join(data_folder, 'DPR_results')
+    save_folder = output_dir if output_dir else os.path.join(data_folder, 'DPR_results')
     os.makedirs(save_folder, exist_ok=True)
+    result_file_type = output_format.lstrip('.') if output_format else file_type
+    output_path = os.path.abspath(os.path.join(save_folder, f'{file_name}_result.{result_file_type}'))
 
     # Run the DPR algorithm
     try:
@@ -49,8 +55,9 @@ def process_image(data_folder, file_name, file_type, psf, options):
 
     # Save the DPR-enhanced image
     try:
-        save_image(dpr_image, save_folder, f'{file_name}_result', file_type)
-        print(f"Results saved to disk: \"{save_folder}/{file_name}_result.{file_type}\"")
+        save_image(dpr_image, save_folder, f'{file_name}_result', result_file_type)
+        print(f"Output image: \"{output_path}\"")
+        print("Done. Check the input and output images at the paths shown above.")
     except Exception as e:
         logging.error(f"Error saving results: {e}")
 

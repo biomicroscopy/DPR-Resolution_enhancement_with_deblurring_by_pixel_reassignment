@@ -20,11 +20,13 @@ def process_image_ml_denoise(data_folder, file_name, file_type, psf, options):
     - magnified_image: Magnified output from DPR.
     """
     logging.info("Starting DPR with deep-learning-based denoising.")
+    input_path = os.path.abspath(os.path.join(data_folder, f"{file_name}.{file_type}"))
 
     # Load image stack
     try:
         initial_image = load_image_stack(data_folder, file_name, file_type)
         logging.info(f"Loaded image stack: {initial_image.shape} (height, width, frames)")
+        logging.info(f"Input image: \"{input_path}\"")
     except Exception as e:
         logging.error(f"Error loading images: {e}")
         return None  # Return None on error
@@ -47,10 +49,12 @@ def process_image_ml_denoise(data_folder, file_name, file_type, psf, options):
     # Save output
     save_folder = os.path.join(data_folder, "DPR_results")
     os.makedirs(save_folder, exist_ok=True)
+    output_path = os.path.abspath(os.path.join(save_folder, f"{file_name}_result.{file_type}"))
 
     try:
         save_image(dpr_image, save_folder, f"{file_name}_result", file_type)
-        logging.info(f"Results saved: \"{save_folder}/{file_name}_result.{file_type}\"")
+        logging.info(f"Output image: \"{output_path}\"")
+        logging.info("Done. Check the input and output images at the paths shown above.")
     except Exception as e:
         logging.error(f"Error saving results: {e}")
 

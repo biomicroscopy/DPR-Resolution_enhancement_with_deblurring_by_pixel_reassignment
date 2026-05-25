@@ -1,112 +1,181 @@
-# **DPR Algorithm (GPU-Optimized Python Version)**
+# DPR Python NVIDIA
 
-## **Overview**
-This directory provides an NVIDIA GPU implementation of the [Deblurring by Pixel Reassignment](https://doi.org/10.1117/1.AP.5.6.066004) (DPR) algorithm using CuPy.
+NVIDIA GPU-accelerated Python version of Deblurring by Pixel Reassignment
+(DPR), implemented with CuPy.
 
-## Hardware Requirements
-This version requires a **computer with an NVIDIA GPU** (e.g., RTX 3080, Tesla V100).
-If your system **does not** have an NVIDIA GPU (e.g., MacBook, AMD GPU), use the `dpr_python_basic` version instead.
+Use this version only on a computer with an NVIDIA GPU and a working NVIDIA
+driver. If you are on a MacBook, AMD GPU, or CPU-only machine, use
+`../dpr_python_basic` instead.
 
-## Project Structure
-```plaintext
-├── dpr_gpu_functions/
-│   ├── set_parameters_gpu.py
-│   ├── process_image_gpu.py
-│   ├── dpr_stack_gpu.py
-│   ├── update_single_gpu.py
-├── test_images/
-│   ├── test_image.tif
-│   ├── sarcomere.tif
-│   ├── test_image_jpg.jpg
-│   ├── sarcomere_jpg.jpg
-├── dpr_gpu_demo.py
-├── README.md
-```
+## Quick Start
 
-## Setup
+First verify that your NVIDIA GPU is visible:
 
-Before getting started, ensure you have the following requirements:
-
-### 1. Python 3.7 or higher
-Verify Python installation and version:
-```sh
-python --version
-```
-If you don't have Python installed, download it from [python.org](https://www.python.org/downloads/).
-
-### 2. Clone the repository:
 ```bash
-git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
-cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_nvidia
-```
-
-### 3. Upgrade pip:
-```sh
-pip install --upgrade pip
-```
-
-### 4. Required Python packages:
-Install the necessary packages:
-```sh
-pip install -r requirements.txt
-```
-or manually via:
-```sh
-pip install numpy scipy Pillow tifffile imageio matplotlib cupy-cuda12x
-```
-
-**Important:** `requirements.txt` uses `cupy-cuda12x`. Replace it with the CuPy package that matches your CUDA installation if needed, for example `cupy-cuda11x` for CUDA 11.x. To determine your CUDA version, refer to the [Confirm CUDA Installation](#confirm-cuda-installation) section. For more details, check the [CuPy Installation Guide](https://docs.cupy.dev/en/stable/install.html).
-
-### 5. FIJI (Optional):
-FIJI is recommended for viewing TIFF images.
-
-- Download FIJI from the [official page](https://imagej.net/software/fiji/downloads).
-- Install and open TIFF files by dragging and dropping them into the FIJI interface.
-
-## CUDA and GPU Acceleration
-
-To leverage GPU acceleration:
-
-### 1. Verify NVIDIA GPU:
-Check if your system has an NVIDIA GPU:
-```sh
 nvidia-smi
 ```
 
-### 2. Install CUDA Toolkit:
+Then install and run the demo:
 
-- Visit the [CUDA Toolkit Downloads page](https://developer.nvidia.com/cuda-downloads).
-- Select your operating system and follow the installation instructions provided.
+```bash
+git clone https://github.com/biomicroscopy/DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment.git
+cd DPR-Resolution_enhancement_with_deblurring_by_pixel_reassignment/Python/dpr_python_nvidia
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
+python3 dpr_gpu_demo.py --input test_images/test_image.tif
+```
 
-### 3. Confirm CUDA Installation:
-After installation, verify your CUDA version:
-```sh
+If you already cloned the repository, start at the `cd` command.
+
+The result is written to:
+
+```text
+test_images/DPR_results/test_image_result.tif
+```
+
+Open TIFF results in FIJI/ImageJ for best compatibility. JPG and PNG results
+can be opened with any normal image viewer.
+
+## CuPy and CUDA Version
+
+This folder's `requirements.txt` installs `cupy-cuda12x`, which is correct for
+CUDA 12.x.
+
+If your system uses CUDA 11.x, install the matching CuPy package instead:
+
+```bash
+python3 -m pip install numpy scipy pillow tifffile imageio matplotlib cupy-cuda11x
+```
+
+To check your CUDA compiler version, run:
+
+```bash
 nvcc --version
 ```
 
-Ensure your CuPy installation matches your CUDA version as mentioned earlier.
+The NVIDIA driver is the most important requirement for the prebuilt CuPy
+packages. If `nvidia-smi` fails, fix the driver/GPU environment before running
+this demo.
 
-## Usage
+## Process Your Own Image
 
-### Running the Demo:
-Execute the DPR processing demo script:
+Use `--input` with the path to your image:
+
 ```bash
-python dpr_gpu_demo.py
+python3 dpr_gpu_demo.py --input /path/to/my_image.tif
 ```
 
-### Provide Input Parameters:
-- **File Name with Type**: Prompted during execution (e.g., `test_image.tif`). Press Enter for default.
-- **Use Default Parameters**: Recommended for demo purposes (`psf=4, gain=2, background=10, temporal='mean'`). Press Enter to accept defaults or manually input custom values.
+By default, the output is saved in a `DPR_results` folder next to the input
+image, and `_result` is added to the filename.
 
-### Viewing Results:
-- Processed images are saved in the `DPR_results` directory inside `test_images`.
-- Saved images have `_result` appended to their original filenames.
-- JPG/PNG images can be viewed with standard image viewers. TIFF files are best viewed using FIJI.
+To choose the output folder and format:
+
+```bash
+python3 dpr_gpu_demo.py \
+  --input /path/to/my_image.tif \
+  --output-dir /path/to/output_folder \
+  --output-format tif
+```
+
+Supported output formats include `tif`, `jpg`, and `png`.
+
+## Common Parameters
+
+The default parameters are a good starting point:
+
+```bash
+python3 dpr_gpu_demo.py \
+  --input test_images/test_image.tif \
+  --psf 4 \
+  --gain 2 \
+  --background 10 \
+  --temporal mean
+```
+
+- `--psf`: point spread function FWHM in pixels. Default: `4`.
+- `--gain`: DPR enhancement gain. Default: `2`.
+- `--background`: background subtraction radius parameter. Default: `10`.
+- `--temporal`: stack reduction mode. Use `mean`, `var`, or `none`. Default:
+  `mean`.
+
+Use `--temporal none` if you want to save the full DPR stack instead of a
+single reduced image.
+
+## Interactive Mode
+
+You can also run the demo without command-line arguments:
+
+```bash
+python3 dpr_gpu_demo.py
+```
+
+Interactive mode asks for the input file and parameters. It expects the input
+image to be inside:
+
+```text
+Python/dpr_python_nvidia/test_images/
+```
+
+## Input Files
+
+Sample files are included in `test_images/`:
+
+- `test_image.tif`
+- `sarcomere.tif`
+- `test_image_jpg.jpg`
+- `sarcomere_jpg.jpg`
+
+For your own data, pass the full file path with `--input`. TIFF stacks and
+standard Pillow-readable image files such as JPG and PNG are supported.
+
+## Troubleshooting
+
+If `nvidia-smi` is not found or does not show your GPU, this GPU version will
+not run. Install or repair the NVIDIA driver, or use `../dpr_python_basic`.
+
+If `ModuleNotFoundError: No module named 'cupy'` appears, install the CuPy
+package that matches your CUDA version:
+
+```bash
+python3 -m pip install cupy-cuda12x
+```
+
+or, for CUDA 11.x:
+
+```bash
+python3 -m pip install cupy-cuda11x
+```
+
+If the script cannot find your image, pass an absolute path:
+
+```bash
+python3 dpr_gpu_demo.py --input /full/path/to/image.tif
+```
+
+If TIFF output does not open correctly in your default image viewer, use FIJI:
+https://imagej.net/software/fiji/downloads
+
+## Project Structure
+
+```text
+dpr_python_nvidia/
+|-- dpr_gpu_demo.py
+|-- requirements.txt
+|-- dpr_gpu_functions/
+|   |-- dpr_stack_gpu.py
+|   |-- process_image_gpu.py
+|   |-- set_parameters_gpu.py
+|   `-- update_single_gpu.py
+`-- test_images/
+    |-- test_image.tif
+    |-- sarcomere.tif
+    |-- test_image_jpg.jpg
+    `-- sarcomere_jpg.jpg
+```
 
 ## License
 
-This project is licensed under the MIT License. See the repository-level [LICENSE](../../LICENSE) file for details.
-
-## Contact
-
-For questions or customized support, please open an issue on the GitHub repository or via email. We're happy to help!
+This project is licensed under the MIT License. See the repository-level
+[LICENSE](../../LICENSE) file for details.
